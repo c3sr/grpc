@@ -38,7 +38,7 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 		grpclogrus.StreamServerInterceptor(log, loggerOpts...),
 	}
 
-	if tracer, err := zipkin.NewTracer(service.ServiceName); err == nil {
+	if tracer, err := zipkin.New(service.ServiceName); err == nil {
 		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
@@ -60,7 +60,7 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 		grpclogrus.StreamClientInterceptor(log, loggerOpts...),
 	}
 
-	if tracer, err := zipkin.NewTracer(service.ServiceName); err == nil {
+	if tracer, err := zipkin.New(service.ServiceName); err == nil {
 		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(tracer)))
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
