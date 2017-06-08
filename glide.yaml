@@ -1,18 +1,15 @@
 package: github.com/rai-project/grpc
 import:
-- package: github.com/sirupsen/logrus
-  version: ~0.11.5
 - package: github.com/grpc-ecosystem/go-grpc-middleware
   subpackages:
   - logging/logrus
   - recovery
-- package: github.com/grpc-ecosystem/grpc-opentracing
-  subpackages:
-  - go/otgrpc
+  - tracing/opentracing
 - package: github.com/rai-project/config
 - package: github.com/rai-project/logger
 - package: github.com/rai-project/tracer
   subpackages:
   - zipkin
+- package: github.com/sirupsen/logrus
 - package: google.golang.org/grpc
   version: ~1.4.0
