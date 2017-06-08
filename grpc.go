@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -23,7 +24,7 @@ var recoveryOpts = []grpc_recovery.Option{
 }
 
 func onPanic(p interface{}) error {
-	log.WithField("values", p).Error("paniced in grpc")
+	log.WithField("values", spew.Sdump(p)).Error("paniced in grpc")
 	return errors.New("recovered from grpc panic")
 }
 
