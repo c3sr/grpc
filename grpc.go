@@ -7,7 +7,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/rai-project/tracer/zipkin"
 	"google.golang.org/grpc"
 )
@@ -39,7 +39,8 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	}
 
 	if tracer, err := zipkin.NewTracer(service.ServiceName); err == nil {
-		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
+		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
+		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
 
 	opts := []grpc.ServerOption{
@@ -60,7 +61,8 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 	}
 
 	if tracer, err := zipkin.NewTracer(service.ServiceName); err == nil {
-		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(tracer))
+		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(tracer)))
+		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
 
 	dialOpts := []grpc.DialOption{
