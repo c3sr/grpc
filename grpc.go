@@ -9,6 +9,7 @@ import (
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/rai-project/tracer/zipkin"
 	"google.golang.org/grpc"
 )
@@ -33,10 +34,12 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		grpclogrus.UnaryServerInterceptor(log, loggerOpts...),
+		grpc_prometheus.UnaryServerInterceptor,
 	}
 	streamInterceptors := []grpc.StreamServerInterceptor{
 		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		grpclogrus.StreamServerInterceptor(log, loggerOpts...),
+		grpc_prometheus.StreamServerInterceptor,
 	}
 
 	if tracer, err := zipkin.New(service.ServiceName); err == nil {
@@ -56,9 +59,11 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		grpclogrus.UnaryClientInterceptor(log, loggerOpts...),
+		grpc_prometheus.UnaryClientInterceptor,
 	}
 	streamInterceptors := []grpc.StreamClientInterceptor{
 		grpclogrus.StreamClientInterceptor(log, loggerOpts...),
+		grpc_prometheus.StreamClientInterceptor,
 	}
 
 	if tracer, err := zipkin.New(service.ServiceName); err == nil {
