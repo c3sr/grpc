@@ -10,7 +10,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/rai-project/tracer/zipkin"
+	"github.com/rai-project/tracer"
 	"google.golang.org/grpc"
 )
 
@@ -42,7 +42,7 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 		grpc_prometheus.StreamServerInterceptor,
 	}
 
-	if tracer, err := zipkin.New(service.ServiceName); err == nil {
+	if tracer, err := tracer.New(service.ServiceName); err == nil {
 		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
@@ -66,7 +66,7 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 		grpc_prometheus.StreamClientInterceptor,
 	}
 
-	if tracer, err := zipkin.New(service.ServiceName); err == nil {
+	if tracer, err := tracer.New(service.ServiceName); err == nil {
 		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(tracer)))
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
