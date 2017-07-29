@@ -11,6 +11,9 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/rai-project/tracer"
+	_ "github.com/rai-project/tracer/jaeger"
+	_ "github.com/rai-project/tracer/noop"
+	_ "github.com/rai-project/tracer/zipkin"
 	"google.golang.org/grpc"
 )
 
