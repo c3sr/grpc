@@ -11,6 +11,8 @@ import:
   - tracing/opentracing
 - package: github.com/grpc-ecosystem/go-grpc-prometheus
   version: master
+- package: github.com/apache/thrift
+  version: master
 - package: github.com/rai-project/config
 - package: github.com/rai-project/logger
 - package: github.com/rai-project/tracer
