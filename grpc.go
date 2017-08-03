@@ -10,10 +10,12 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/rai-project/tracer"
 	_ "github.com/rai-project/tracer/jaeger"
 	_ "github.com/rai-project/tracer/noop"
 	_ "github.com/rai-project/tracer/zipkin"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
@@ -60,7 +62,7 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	return grpc.NewServer(opts...)
 }
 
-func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		grpclogrus.UnaryClientInterceptor(log, loggerOpts...),
@@ -71,9 +73,9 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 		grpc_prometheus.StreamClientInterceptor,
 	}
 
-	if tracer, err := tracer.New(service.ServiceName); err == nil {
-		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(tracer)))
-		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(tracer)))
+	if span, ok := ctx.Value("TracingSpan").(opentracing.Span); ok {
+		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
+		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
 	}
 
 	dialOpts := []grpc.DialOption{
@@ -85,5 +87,5 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 	}
 	extra := []grpc.DialOption{}
 	dialOpts = append(dialOpts, extra...)
-	return grpc.Dial(addr, dialOpts...)
+	return grpc.DialContext(ctx, addr, dialOpts...)
 }
