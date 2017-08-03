@@ -73,7 +73,7 @@ func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opt
 		grpc_prometheus.StreamClientInterceptor,
 	}
 
-	if span, ok := ctx.Value("TracingSpan").(opentracing.Span); ok {
+	if span := opentracing.SpanFromContext(ctx); span != nil {
 		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
 	}
