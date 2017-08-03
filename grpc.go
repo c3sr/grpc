@@ -53,6 +53,8 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc_middleware.WithUnaryServerChain(unaryInterceptors...),
 		grpc_middleware.WithStreamServerChain(streamInterceptors...),
+		grpc.RPCCompressor(grpc.NewGZIPCompressor()),
+		grpc.RPCDecompressor(grpc.NewGZIPDecompressor()),
 		grpc.MaxMsgSize(500 * 1024 * 1024), // 500 MB
 	}
 	return grpc.NewServer(opts...)
@@ -78,6 +80,8 @@ func Dial(service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc
 		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(unaryInterceptors...)),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(streamInterceptors...)),
+		grpc.WithCompressor(grpc.NewGZIPCompressor()),
+		grpc.WithDecompressor(grpc.NewGZIPDecompressor()),
 	}
 	extra := []grpc.DialOption{}
 	dialOpts = append(dialOpts, extra...)

@@ -1,16 +1,26 @@
 package: github.com/rai-project/grpc
 import:
+- package: github.com/davecgh/go-spew
+  version: ~1.1.0
+  subpackages:
+  - spew
 - package: github.com/grpc-ecosystem/go-grpc-middleware
   subpackages:
   - logging/logrus
   - recovery
   - tracing/opentracing
+- package: github.com/grpc-ecosystem/go-grpc-prometheus
+  version: ~1.1.0
 - package: github.com/rai-project/config
 - package: github.com/rai-project/logger
 - package: github.com/rai-project/tracer
   subpackages:
+  - jaeger
+  - noop
   - zipkin
+- package: github.com/rs/cors
+  version: ~1.2.0
 - package: github.com/sirupsen/logrus
-  version: ^1.0.0
+  version: ~1.0.2
 - package: google.golang.org/grpc
-  version: ~1.4.0
+  version: ~1.5.1
