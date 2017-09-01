@@ -63,9 +63,8 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 }
 
 func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
-		grpclogrus.UnaryClientInterceptor(log, loggerOpts...),
+		grpclogrus.UnaryClientInterceptor(log.WithField("dial_address", addr), loggerOpts...),
 		grpc_prometheus.UnaryClientInterceptor,
 	}
 	streamInterceptors := []grpc.StreamClientInterceptor{
