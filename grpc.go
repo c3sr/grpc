@@ -1,16 +1,17 @@
 package grpc
 
 import (
-	"errors"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/facebookgo/stack"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/pkg/errors"
 	"github.com/rai-project/tracer"
 	_ "github.com/rai-project/tracer/jaeger"
 	_ "github.com/rai-project/tracer/noop"
@@ -30,8 +31,9 @@ var recoveryOpts = []grpc_recovery.Option{
 }
 
 func onPanic(p interface{}) error {
-	log.WithField("values", spew.Sdump(p)).Error("paniced in grpc")
-	return errors.New("recovered from grpc panic")
+	stack := stack.Callers(1)
+	log.WithField("values", spew.Sdump(p)).WithField("stack", stack).Error("paniced in grpc")
+	return errors.WithStack(errors.New("recovered from grpc panic"))
 }
 
 func NewServer(service grpc.ServiceDesc) *grpc.Server {
