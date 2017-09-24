@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"math"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -18,6 +19,13 @@ import (
 	_ "github.com/rai-project/tracer/zipkin"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
+)
+
+const (
+	defaultWindowSize     = 65535
+	initialWindowSize     = defaultWindowSize * 32 // for an RPC
+	initialConnWindowSize = initialWindowSize * 16 // for a connection
 )
 
 var loggerOpts = []grpclogrus.Option{
@@ -57,9 +65,34 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc_middleware.WithUnaryServerChain(unaryInterceptors...),
 		grpc_middleware.WithStreamServerChain(streamInterceptors...),
-		grpc.RPCCompressor(grpc.NewGZIPCompressor()),
-		grpc.RPCDecompressor(grpc.NewGZIPDecompressor()),
-		grpc.MaxMsgSize(500 * 1024 * 1024), // 500 MB
+
+		// The limiting factor for lowering the max message size is the fact
+		// that a single large kv can be sent over the network in one message.
+		// Our maximum kv size is unlimited, so we need this to be very large.
+		//
+		// TODO(peter,tamird): need tests before lowering.
+		grpc.MaxRecvMsgSize(math.MaxInt32),
+		grpc.MaxSendMsgSize(math.MaxInt32),
+		// Adjust the stream and connection window sizes. The gRPC defaults are too
+		// low for high latency connections.
+		grpc.InitialWindowSize(initialWindowSize),
+		grpc.InitialConnWindowSize(initialConnWindowSize),
+		// The default number of concurrent streams/requests on a client connection
+		// is 100, while the server is unlimited. The client setting can only be
+		// controlled by adjusting the server value. Set a very large value for the
+		// server value so that we have no fixed limit on the number of concurrent
+		// streams/requests on either the client or server.
+		grpc.MaxConcurrentStreams(math.MaxInt32),
+		grpc.RPCDecompressor(snappyDecompressor{}),
+		// By default, gRPC disconnects clients that send "too many" pings,
+		// but we don't really care about that, so configure the server to be
+		// as permissive as possible.
+		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+			MinTime:             time.Nanosecond,
+			PermitWithoutStream: true,
+		}),
+		grpc.RPCCompressor(snappyCompressor{}),
+		grpc.RPCDecompressor(snappyDecompressor{}),
 	}
 	return grpc.NewServer(opts...)
 }
@@ -83,8 +116,14 @@ func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opt
 		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(unaryInterceptors...)),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(streamInterceptors...)),
-		grpc.WithCompressor(grpc.NewGZIPCompressor()),
-		grpc.WithDecompressor(grpc.NewGZIPDecompressor()),
+
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt32), grpc.MaxCallSendMsgSize(math.MaxInt32)),
+
+		grpc.WithInitialWindowSize(initialWindowSize),
+		grpc.WithInitialConnWindowSize(initialConnWindowSize),
+
+		grpc.WithCompressor(snappyCompressor{}),
+		grpc.WithDecompressor(snappyDecompressor{}),
 	}
 	extra := []grpc.DialOption{}
 	dialOpts = append(dialOpts, extra...)
