@@ -69,8 +69,6 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 		// The limiting factor for lowering the max message size is the fact
 		// that a single large kv can be sent over the network in one message.
 		// Our maximum kv size is unlimited, so we need this to be very large.
-		//
-		// TODO(peter,tamird): need tests before lowering.
 		grpc.MaxRecvMsgSize(math.MaxInt32),
 		grpc.MaxSendMsgSize(math.MaxInt32),
 		// Adjust the stream and connection window sizes. The gRPC defaults are too
