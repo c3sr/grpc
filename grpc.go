@@ -14,6 +14,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	cupti "github.com/rai-project/go-cupti"
+	cuptigrpc "github.com/rai-project/go-cupti/grpc"
 	"github.com/rai-project/tracer"
 	_ "github.com/rai-project/tracer/jaeger"
 	_ "github.com/rai-project/tracer/noop"
@@ -61,6 +63,9 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	if tracer, err := tracer.New(service.ServiceName); err == nil {
 		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
+		if *Config.EnableCUPTI {
+			unaryInterceptors = append(unaryInterceptors, cuptigrpc.ServerUnaryInterceptor(cupti.Tracer(tracer)))
+		}
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
 	}
 
