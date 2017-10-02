@@ -121,7 +121,7 @@ func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opt
 	}
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
-		if false {
+		if true {
 			unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
 			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(span.Tracer()))
 		}
