@@ -14,9 +14,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	cupti "github.com/rai-project/go-cupti"
 	cuptigrpc "github.com/rai-project/go-cupti/grpc"
-	"github.com/rai-project/tracer"
+	tr "github.com/rai-project/tracer"
 	_ "github.com/rai-project/tracer/jaeger"
 	_ "github.com/rai-project/tracer/noop"
 	_ "github.com/rai-project/tracer/zipkin"
@@ -47,7 +46,7 @@ func onPanic(p interface{}) error {
 	return errors.WithStack(errors.New("recovered from grpc panic"))
 }
 
-func NewServer(service grpc.ServiceDesc) *grpc.Server {
+func NewServer(service grpc.ServiceDesc, tracer tr.Tracer) *grpc.Server {
 	grpclogrus.ReplaceGrpcLogger(log)
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
@@ -60,13 +59,22 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 		grpc_prometheus.StreamServerInterceptor,
 	}
 
-	if tracer, err := tracer.New(service.ServiceName); err == nil {
-		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
-		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
-		if *Config.EnableCUPTI {
-			unaryInterceptors = append(unaryInterceptors, cuptigrpc.ServerUnaryInterceptor(cupti.Tracer(tracer)))
+	if service.ServiceName != "carml.org.dlframework.Registry" {
+		if tracer == nil {
+			var err error
+			tracer, err = tr.New(service.ServiceName)
+			if err != nil {
+				tracer = nil
+			}
 		}
-		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
+		if tracer != nil {
+			unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
+			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
+			if *Config.EnableCUPTI {
+				unaryInterceptors = append(unaryInterceptors, cuptigrpc.ServerUnaryInterceptor(tracer))
+			}
+			streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
+		}
 	}
 
 	opts := []grpc.ServerOption{
@@ -113,8 +121,10 @@ func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opt
 	}
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
-		unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
-		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(span.Tracer()))
+		if false {
+			unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
+			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(span.Tracer()))
+		}
 		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
 	}
 
