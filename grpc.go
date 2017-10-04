@@ -9,14 +9,15 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	"github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	cupti "github.com/rai-project/go-cupti"
 	cuptigrpc "github.com/rai-project/go-cupti/grpc"
 	tr "github.com/rai-project/tracer"
 	_ "github.com/rai-project/tracer/jaeger"
+	tracegrpc "github.com/rai-project/tracer/middleware/grpc"
 	_ "github.com/rai-project/tracer/noop"
 	_ "github.com/rai-project/tracer/zipkin"
 	"golang.org/x/net/context"
@@ -68,12 +69,12 @@ func NewServer(service grpc.ServiceDesc, tracer tr.Tracer) *grpc.Server {
 			}
 		}
 		if tracer != nil {
-			unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithTracer(tracer)))
+			unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryServerInterceptor(tracegrpc.WithTracer(tracer)))
 			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
 			if *Config.EnableCUPTI {
-				unaryInterceptors = append(unaryInterceptors, cuptigrpc.ServerUnaryInterceptor(tracer))
+				unaryInterceptors = append(unaryInterceptors, cuptigrpc.ServerUnaryInterceptor(cupti.Tracer(tracer)))
 			}
-			streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamServerInterceptor(grpc_opentracing.WithTracer(tracer)))
+			streamInterceptors = append(streamInterceptors, tracegrpc.StreamServerInterceptor(tracegrpc.WithTracer(tracer)))
 		}
 	}
 
@@ -122,10 +123,10 @@ func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opt
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
 		if true {
-			unaryInterceptors = append(unaryInterceptors, grpc_opentracing.UnaryClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
+			unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryClientInterceptor(tracegrpc.WithTracer(span.Tracer())))
 			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(span.Tracer()))
 		}
-		streamInterceptors = append(streamInterceptors, grpc_opentracing.StreamClientInterceptor(grpc_opentracing.WithTracer(span.Tracer())))
+		streamInterceptors = append(streamInterceptors, tracegrpc.StreamClientInterceptor(tracegrpc.WithTracer(span.Tracer())))
 	}
 
 	dialOpts := []grpc.DialOption{
