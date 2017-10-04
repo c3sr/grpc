@@ -13,7 +13,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	tr "github.com/rai-project/tracer"
+	"github.com/rai-project/tracer"
 	_ "github.com/rai-project/tracer/jaeger"
 	tracegrpc "github.com/rai-project/tracer/middleware/grpc"
 	_ "github.com/rai-project/tracer/noop"
@@ -45,7 +45,7 @@ func onPanic(p interface{}) error {
 	return errors.WithStack(errors.New("recovered from grpc panic"))
 }
 
-func NewServer(service grpc.ServiceDesc, tracer tr.Tracer) *grpc.Server {
+func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	grpclogrus.ReplaceGrpcLogger(log)
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
@@ -58,19 +58,11 @@ func NewServer(service grpc.ServiceDesc, tracer tr.Tracer) *grpc.Server {
 		grpc_prometheus.StreamServerInterceptor,
 	}
 
-	if service.ServiceName != "carml.org.dlframework.Registry" {
-		if tracer == nil {
-			var err error
-			tracer, err = tr.New(service.ServiceName)
-			if err != nil {
-				tracer = nil
-			}
-		}
-		if tracer != nil {
-			unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryServerInterceptor(tracegrpc.WithTracer(tracer)))
-			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
-			streamInterceptors = append(streamInterceptors, tracegrpc.StreamServerInterceptor(tracegrpc.WithTracer(tracer)))
-		}
+	tracer := tracer.Std()
+	if tracer != nil {
+		unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryServerInterceptor(tracegrpc.WithTracer(tracer)))
+		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
+		streamInterceptors = append(streamInterceptors, tracegrpc.StreamServerInterceptor(tracegrpc.WithTracer(tracer)))
 	}
 
 	opts := []grpc.ServerOption{
