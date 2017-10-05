@@ -10,7 +10,6 @@ import (
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/rai-project/tracer"
@@ -61,7 +60,7 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	tracer := tracer.Std()
 	if tracer != nil {
 		unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryServerInterceptor(tracegrpc.WithTracer(tracer)))
-		unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
+		//unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingServerInterceptor(tracer))
 		streamInterceptors = append(streamInterceptors, tracegrpc.StreamServerInterceptor(tracegrpc.WithTracer(tracer)))
 	}
 
@@ -109,10 +108,8 @@ func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opt
 	}
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
-		if true {
-			unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryClientInterceptor(tracegrpc.WithTracer(span.Tracer())))
-			unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(span.Tracer()))
-		}
+		unaryInterceptors = append(unaryInterceptors, tracegrpc.UnaryClientInterceptor(tracegrpc.WithTracer(span.Tracer())))
+		//unaryInterceptors = append(unaryInterceptors, otgrpc.OpenTracingClientInterceptor(span.Tracer()))
 		streamInterceptors = append(streamInterceptors, tracegrpc.StreamClientInterceptor(tracegrpc.WithTracer(span.Tracer())))
 	}
 
