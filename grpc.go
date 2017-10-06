@@ -9,7 +9,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	//"github.com/grpc-ecosystem/go-grpc-prometheus"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/rai-project/tracer"
@@ -49,12 +49,12 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		grpclogrus.UnaryServerInterceptor(log, loggerOpts...),
-		grpc_prometheus.UnaryServerInterceptor,
+		//grpc_prometheus.UnaryServerInterceptor,
 	}
 	streamInterceptors := []grpc.StreamServerInterceptor{
 		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		grpclogrus.StreamServerInterceptor(log, loggerOpts...),
-		grpc_prometheus.StreamServerInterceptor,
+		//grpc_prometheus.StreamServerInterceptor,
 	}
 
 	tracer := tracer.Std()
@@ -100,11 +100,11 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		grpclogrus.UnaryClientInterceptor(log.WithField("dial_address", addr), loggerOpts...),
-		grpc_prometheus.UnaryClientInterceptor,
+		//grpc_prometheus.UnaryClientInterceptor,
 	}
 	streamInterceptors := []grpc.StreamClientInterceptor{
 		grpclogrus.StreamClientInterceptor(log, loggerOpts...),
-		grpc_prometheus.StreamClientInterceptor,
+		//grpc_prometheus.StreamClientInterceptor,
 	}
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
