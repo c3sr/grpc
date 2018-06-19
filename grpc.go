@@ -10,6 +10,7 @@ import (
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	//"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"context"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/rai-project/tracer"
@@ -17,7 +18,6 @@ import (
 	tracegrpc "github.com/rai-project/tracer/middleware/grpc"
 	_ "github.com/rai-project/tracer/noop"
 	_ "github.com/rai-project/tracer/zipkin"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
