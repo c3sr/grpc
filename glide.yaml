@@ -24,4 +24,4 @@ import:
 - package: github.com/sirupsen/logrus
   version: ^1.0.0
 - package: google.golang.org/grpc
-  version: ^1.7.0
+  version: ^1.12.2
