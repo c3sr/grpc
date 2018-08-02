@@ -85,6 +85,10 @@
   name = "google.golang.org/grpc"
   version = "1.13.0"
 
+[[override]]
+  branch = "master"
+  name = "github.com/apache/thrift"
+
 [prune]
   go-tests = true
   unused-packages = true
