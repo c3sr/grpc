@@ -434,8 +434,7 @@
   revision = "e67904ef854ae00a55270b7bc2a3a2bd875ee080"
 
 [[projects]]
-  branch = "master"
-  digest = "1:17300ecf84639ad5ac2bc3466c4993f928e37fa7f9c6653ad98bcc3038c41256"
+  digest = "1:069cc5776a6fb0f5760335cc3a25f21d6171394f3da7ce18748d6de0ab4a0e4d"
   name = "github.com/rai-project/tracer"
   packages = [
     ".",
@@ -448,7 +447,8 @@
     "zipkin",
   ]
   pruneopts = "UT"
-  revision = "1813199cbcd257a5b9bbeff9496a877303a24523"
+  revision = "99de7d4e81ce7fc75f5d12a31cddd5db8f233281"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
