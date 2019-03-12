@@ -6,11 +6,14 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/facebookgo/stack"
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
-	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+
 	//"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"context"
+
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/rai-project/tracer"
@@ -93,16 +96,27 @@ func NewServer(service grpc.ServiceDesc) *grpc.Server {
 		}),
 		grpc.RPCCompressor(snappyCompressor{}),
 		grpc.RPCDecompressor(snappyDecompressor{}),
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			MaxConnectionIdle: 5 * time.Minute, // https://stackoverflow.com/questions/52993259/problem-with-grpc-setup-getting-an-intermittent-rpc-unavailable-error/54703234#54703234
+		}),
 	}
 	return grpc.NewServer(opts...)
 }
 
 func DialContext(ctx context.Context, service grpc.ServiceDesc, addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+
+	retryOpts := []grpcRetry.CallOption{
+		grpcRetry.WithMax(10),
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponential(100 * time.Millisecond)),
+	}
+
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
+		grpcRetry.UnaryClientInterceptor(retryOpts...),
 		grpclogrus.UnaryClientInterceptor(log.WithField("dial_address", addr), loggerOpts...),
 		//grpc_prometheus.UnaryClientInterceptor,
 	}
 	streamInterceptors := []grpc.StreamClientInterceptor{
+		grpcRetry.StreamClientInterceptor(retryOpts...),
 		grpclogrus.StreamClientInterceptor(log, loggerOpts...),
 		//grpc_prometheus.StreamClientInterceptor,
 	}
