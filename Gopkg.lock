@@ -195,7 +195,7 @@
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
-  digest = "1:37201c999263387b04029290a9033ba5d9e49c0474f1e10ebbbe42090d84d655"
+  digest = "0:"
   name = "github.com/grpc-ecosystem/go-grpc-middleware"
   packages = [
     ".",
@@ -203,8 +203,10 @@
     "logging/logrus",
     "logging/logrus/ctxlogrus",
     "recovery",
+    "retry",
     "tags",
     "tags/logrus",
+    "util/backoffutils",
     "util/metautils",
   ]
   pruneopts = "UT"
@@ -751,6 +753,7 @@
     "github.com/grpc-ecosystem/go-grpc-middleware",
     "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus",
     "github.com/grpc-ecosystem/go-grpc-middleware/recovery",
+    "github.com/grpc-ecosystem/go-grpc-middleware/retry",
     "github.com/k0kubun/pp",
     "github.com/opentracing/opentracing-go",
     "github.com/pkg/errors",
