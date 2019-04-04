@@ -4,6 +4,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/k0kubun/pp"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/facebookgo/stack"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -42,7 +44,8 @@ var recoveryOpts = []grpc_recovery.Option{
 }
 
 func onPanic(p interface{}) error {
-	stack := stack.Callers(1)
+	stack := stack.Callers(8)
+	pp.Println(stack)
 	log.WithField("values", spew.Sdump(p)).WithField("stack", stack).Error("paniced in grpc")
 	return errors.WithStack(errors.New("recovered from grpc panic"))
 }
