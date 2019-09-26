@@ -22,7 +22,6 @@ import (
 	_ "github.com/rai-project/tracer/jaeger"
 	tracegrpc "github.com/rai-project/tracer/middleware/grpc"
 	_ "github.com/rai-project/tracer/noop"
-	_ "github.com/rai-project/tracer/zipkin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
