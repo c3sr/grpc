@@ -1,19 +1,17 @@
 language: go
-matrix:
+jobs:
   include:
-    - go: 1.10.x
-    - go: 1.11.x
+    - go: 1.12.x
     - go: tip
   allow_failures:
     - go: tip
+os: linux
 dist: xenial
-sudo: false
 before_install:
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 install:
-  - dep ensure
-  - go build -tags=nogpu
-script:
-  - echo "Skip tests..."
+  - dep ensure -v -vendor-only
+  - go build -tags=nogpu ./...
+script: true
 after_script:
-  - go test -tags=nogpu -race -v .
+  - go test -race -v -tags=nogpu ./...

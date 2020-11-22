@@ -18,10 +18,10 @@ import (
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	"github.com/rai-project/tracer"
-	_ "github.com/rai-project/tracer/jaeger"
-	tracegrpc "github.com/rai-project/tracer/middleware/grpc"
-	_ "github.com/rai-project/tracer/noop"
+	"github.com/c3sr/tracer"
+	_ "github.com/c3sr/tracer/jaeger"
+	tracegrpc "github.com/c3sr/tracer/middleware/grpc"
+	_ "github.com/c3sr/tracer/noop"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
