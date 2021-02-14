@@ -66,56 +66,55 @@
   version = "v0.0.3"
 
 [[projects]]
-  branch = "master"
-  digest = "1:3e3f58d4204ffe581c8bf7140026b17cfa55704e2e4f534398a234a19bd08af1"
+  digest = "0:"
   name = "github.com/c3sr/config"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e9d07ff805c35518081968c3cdb61e2a452cacff"
+  revision = "35ed8e2450bf72580413486a801a469faeb04189"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:fee881074ab4b9858f916e89041fcd6db2c8046ebdb1faf3238b79d5d8b6394c"
+  digest = "0:"
   name = "github.com/c3sr/logger"
   packages = ["."]
   pruneopts = "UT"
-  revision = "3a1b4f2fe0a8cff889e1ee8fbda6967bd9c0d550"
+  revision = "159591d2749003f68b0dacfadf03ab90a18f66c1"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:e7125b75b38b4fc4543a318d2b5a4fc7a7f57afef38d2d03986340b27d40b812"
+  digest = "0:"
   name = "github.com/c3sr/machine"
   packages = ["os"]
   pruneopts = "UT"
-  revision = "6628880864ba48724ca5f7b63fe9995d4c5f3689"
+  revision = "96aea5331fe77b9d53c90a5b58b3a12ceb46cea7"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4dae73732225311084a7d04f66d4351a6f699a856de0059cf9ef3c5fdfd03242"
+  digest = "0:"
   name = "github.com/c3sr/nvidia-smi"
   packages = ["."]
   pruneopts = "UT"
-  revision = "3a66214ea3aa0157acb2be6e47d4c548e9ac7b65"
+  revision = "00b505f3250dec433a7bae0a401d40e40be5c657"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:6c8f7f7333bc8f2ddcb25508dea709fb817491f6cb4b8d10a2844e31652cce00"
+  digest = "0:"
   name = "github.com/c3sr/nvml-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c893af65d8c554dae557672dc257f3849a1435db"
+  revision = "54dd66e81b09c73bb3ee3b74b0befd6dbbf78740"
+  version = "v0.2.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d037bb37a16bc993801a5cad3edf83058e54814ec8ae805327174adee51d3fbc"
+  digest = "0:"
   name = "github.com/c3sr/tegra"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e3625f658736e0adf15862b5ee7ed6f405a69411"
+  revision = "7c9c6c300dc463e50d35c93c28d2f684cdbd73a2"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:671016d0031f9e6331e791c66f63a51bc90b165463f1e0b71158e0b22dc8fcb4"
+  digest = "0:"
   name = "github.com/c3sr/tracer"
   packages = [
     ".",
@@ -127,31 +126,32 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "43da420e1ef6bf956c8dfd78d3cce306c1cfa781"
+  revision = "5aa2b32716b83fd736644a94b13fea619d073ba8"
+  version = "v0.3.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:76f07a4f650254ba509f97107408ba2d3923f21490ed983fdd3d79e8c6b7838b"
+  digest = "0:"
   name = "github.com/c3sr/utils"
   packages = ["."]
   pruneopts = "UT"
-  revision = "1131f94737fa162c7abd799d49e0e61d28827bd7"
+  revision = "8c94d0bf9baa1095effd041da69653e1103b68c7"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:c7c5356462640cb1ce5337a7f48991bcdfa7f768af0037f40f7dc3b5433e56fe"
+  digest = "0:"
   name = "github.com/c3sr/uuid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "16bb3b3c5514e4f48dc6740cd05a6e0b55a56353"
+  revision = "97e22344270854c12f76eb69850d917025368add"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:da993593fb42403a3695f952e3666346fc3b510862c3a1086006c7566fa004b9"
+  digest = "0:"
   name = "github.com/c3sr/vipertags"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c54404b591155101716768833b5eee64aca9a3cd"
+  revision = "b8a9fd68c520fe07ffbf7f642b7e73eac2a0434f"
+  version = "v0.1.0"
 
 [[projects]]
   digest = "1:f438d91be142877c3ad83157992c91de787ddfbddcc2a7da1ef6ef61606cadc4"
